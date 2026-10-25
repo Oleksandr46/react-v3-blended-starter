@@ -9,7 +9,7 @@ export default function Form({ onSubmit }: FormProps) {
   const handleSubmit = (formData: FormData) => {
     const inputValue = formData.get("search") as string;
     if (inputValue === "") {
-      toast.error("Введіть значення!");
+      toast.error("Enter the value!");
       return;
     }
     onSubmit(inputValue);
