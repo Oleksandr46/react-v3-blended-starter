@@ -1,13 +1,17 @@
-import type { Photo } from "../../types/photo";
-import GridItem from "../GridItem/GridItem";
+import type { Photo } from '../../types/photo';
+import GridItem from '../GridItem/GridItem';
 
-import styles from "./PhotosGalleryItem.module.css";
+import styles from './PhotosGalleryItem.module.css';
 
-interface PhotosGalleryItemProps{
-item: Photo
+interface PhotosGalleryItemProps {
+  item: Photo;
+  onPhotoClick: (photo: Photo) => void;
 }
 
-export default function PhotosGalleryItem({item}:PhotosGalleryItemProps) {
+export default function PhotosGalleryItem({
+  item,
+  onPhotoClick,
+}: PhotosGalleryItemProps) {
   return (
     <GridItem>
       <div
@@ -17,7 +21,11 @@ export default function PhotosGalleryItem({item}:PhotosGalleryItemProps) {
           borderColor: item.avg_color,
         }}
       >
-        <img src={item.src.original} alt={item.alt} />
+        <img
+          src={item.src.original}
+          alt={item.alt}
+          onClick={() => onPhotoClick(item)}
+        />
       </div>
     </GridItem>
   );

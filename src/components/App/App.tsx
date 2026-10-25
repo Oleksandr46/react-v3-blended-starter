@@ -1,17 +1,21 @@
-import Section from "../Section/Section";
-import Container from "../Container/Container";
-import { getPhotos } from "../../services/photos";
-import {  useState } from "react";
-import Form from "../Form/Form";
-import type { Photo } from "../../types/photo";
-import PhotosGallery from "../PhotosGallery/PhotosGallery";
-import toast, { Toaster } from "react-hot-toast";
-import Loader from "../Loader/Loader";
+import Section from '../Section/Section';
+import Container from '../Container/Container';
+import { getPhotos } from '../../services/photos';
+import { useState } from 'react';
+import Form from '../Form/Form';
+import type { Photo } from '../../types/photo';
+import PhotosGallery from '../PhotosGallery/PhotosGallery';
+import toast, { Toaster } from 'react-hot-toast';
+import Loader from '../Loader/Loader';
+import Modal from '../Modal/Modal';
+import Text from '../Text/Text';
 
 export default function App() {
+  const [photos, setPhotos] = useState<Photo[] | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
-  const [photos, setPhotos]=useState<Photo[] | null>(null);
-  const [isLoading, setIsLoading]=useState(false);
   // useEffect(() => {
   //   const getResponse = async () => {
   //     const response = await getPhotos("cat");
@@ -21,22 +25,26 @@ export default function App() {
   // }, []);
   const handleSubmit = async (value: string) => {
     setIsLoading(true);
-    try{
-const response = await getPhotos(value);
-    if (response.length===0){
-      toast.error("Try another querry");
-      setPhotos(null);
-      return;
-    }
+    setIsError(false);
+    try {
+      const response = await getPhotos(value);
+      if (response.length === 0) {
+        toast.error('Try another querry');
+        setPhotos(null);
+        return;
+      }
 
-    setPhotos(response);
-    }
-     catch (error){
-console.error(error);
-    }
-    finally{
+      setPhotos(response);
+    } catch (error) {
+      console.error(error);
+      setIsError(true);
+    } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePhotoClick = (photo: Photo | null) => {
+    setSelectedPhoto(photo);
   };
 
   return (
@@ -44,9 +52,18 @@ console.error(error);
       <Section>
         <Container>
           <Form onSubmit={handleSubmit} />
-          <Toaster/>
+          <Toaster />
+          {isError && <Text>Something went wrong, try later!</Text>}
           {isLoading && <Loader />}
-         {photos && photos.length>0 && <PhotosGallery photos={photos}/>}
+          {photos && photos.length > 0 && (
+            <PhotosGallery photos={photos} onPhotoClick={handlePhotoClick} />
+          )}
+
+          {selectedPhoto && (
+            <Modal onClose={() => handlePhotoClick(null)}>
+              <img src={selectedPhoto.src.large} alt={selectedPhoto.alt} />
+            </Modal>
+          )}
         </Container>
       </Section>
     </>
