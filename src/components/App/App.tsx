@@ -9,6 +9,8 @@ import css from "./App.module.css";
 import { useState } from "react";
 import { useDebounce } from "use-debounce";
 import PostForm from "../CreatePostForm/CreatePostForm";
+import type { Post } from "../../types/post";
+import EditPostForm from "../EditPostForm/EditPostForm";
 
 export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,6 +18,8 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreatePost, setIsCreatePost] = useState(false);
+  const [editedPost, setEditedPost] = useState<Post | null>(null);
+  const [isEditPost, setIsEditPost] = useState(false);
 
   const { data, isSuccess } = useQuery({
     queryKey: ["posts", debouncedSearchQuery, currentPage],
@@ -26,6 +30,11 @@ export default function App() {
   const handleSetSearchQuery = (query: string) => {
     setCurrentPage(1);
     setSearchQuery(query);
+  };
+
+  const toggleEditPost = (post: Post) => {
+    setEditedPost(post);
+    setIsEditPost(true);
   };
 
   const totalPages = data ? Math.ceil(data?.totalCount / 8) : 0;
@@ -61,9 +70,26 @@ export default function App() {
               }}
             />
           )}
+
+          {isEditPost && editedPost && (
+            <EditPostForm
+              initialValues={editedPost}
+              onClose={() => {
+                setIsModalOpen(false);
+                setIsEditPost(false);
+                setEditedPost(null);
+              }}
+            />
+          )}
         </Modal>
       )}
-      {isSuccess && data.posts.length > 0 && <PostList posts={data.posts} />}
+      {isSuccess && data.posts.length > 0 && (
+        <PostList
+          posts={data.posts}
+          toggleEditPost={toggleEditPost}
+          toggleModal={() => setIsModalOpen(true)}
+        />
+      )}
     </div>
   );
 }

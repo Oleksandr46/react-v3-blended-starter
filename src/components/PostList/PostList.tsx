@@ -5,14 +5,16 @@ import { deletePost } from "../../services/postService";
 
 interface PostListProps {
   posts: Post[];
+  toggleEditPost: (post: Post) => void;
+  toggleModal: () => void;
 }
 
-export default function PostList({ posts }: PostListProps) {
+export default function PostList({ posts, toggleEditPost, toggleModal }: PostListProps) {
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: deletePost,
     onSuccess: () => {
-      alert("Post deleted succesfully");
+      alert("Post deleted successfully");
       queryClient.invalidateQueries({
         queryKey: ["posts"],
       });
@@ -26,7 +28,15 @@ export default function PostList({ posts }: PostListProps) {
           <h2 className={css.title}>{post.title}</h2>
           <p className={css.content}>{post.body}</p>
           <div className={css.footer}>
-            <button className={css.edit}>Edit</button>
+            <button
+              className={css.edit}
+              onClick={() => {
+                toggleEditPost(post);
+                toggleModal();
+              }}
+            >
+              Edit
+            </button>
             <button className={css.delete} onClick={() => mutate(post.id)}>
               Delete
             </button>
