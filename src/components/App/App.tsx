@@ -8,12 +8,14 @@ import Pagination from "../Pagination/Pagination";
 import css from "./App.module.css";
 import { useState } from "react";
 import { useDebounce } from "use-debounce";
+import PostForm from "../CreatePostForm/CreatePostForm";
 
 export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreatePost, setIsCreatePost] = useState(false);
 
   const { data, isSuccess } = useQuery({
     queryKey: ["posts", debouncedSearchQuery, currentPage],
@@ -39,11 +41,28 @@ export default function App() {
             onPageChange={setCurrentPage}
           />
         )}
-        <button className={css.button} onClick={() => setIsModalOpen(true)}>
+        <button
+          className={css.button}
+          onClick={() => {
+            setIsModalOpen(true);
+            setIsCreatePost(true);
+          }}
+        >
           Create post
         </button>
       </header>
-      {isModalOpen && <Modal onClose={() => setIsModalOpen(false)}>Hello</Modal>}
+      {isModalOpen && (
+        <Modal onClose={() => setIsModalOpen(false)}>
+          {isCreatePost && (
+            <PostForm
+              onClose={() => {
+                setIsModalOpen(false);
+                setIsCreatePost(false);
+              }}
+            />
+          )}
+        </Modal>
+      )}
       {isSuccess && data.posts.length > 0 && <PostList posts={data.posts} />}
     </div>
   );
