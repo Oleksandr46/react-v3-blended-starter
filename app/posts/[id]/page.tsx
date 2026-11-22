@@ -1,0 +1,25 @@
+import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
+import PostDetailsClient from './PostDetails.client';
+import { fetchPostById } from '@/lib/api';
+
+interface PostDetailsProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function PostDetails({params}: PostDetailsProps) {
+  const queryClient = new QueryClient();
+
+  const { id } = await params;
+  const postId = Number(id);
+
+  await queryClient.prefetchQuery({
+    queryKey: ['post', postId],
+    queryFn: () => fetchPostById(postId),
+  })
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <PostDetailsClient />
+    </HydrationBoundary>
+  );
+}
