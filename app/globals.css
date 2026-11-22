@@ -5,6 +5,7 @@ body {
 }
 
 body {
+  color: #fff;
   font-family: 'Open Sans', sans-serif;
   display: flex;
   flex-direction: column;
